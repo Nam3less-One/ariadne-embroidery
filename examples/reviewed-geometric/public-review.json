@@ -1,0 +1,25 @@
+{
+  "review": "independent digital sample review",
+  "source_fidelity_score": 8.4,
+  "digitizing_quality_score": 8.0,
+  "physical_sewout": "not performed",
+  "scope": "Only these exact geometric sample files; not an engine-wide guarantee",
+  "pes_sha256": "8d0e7cabfceaca2bf10c9d2bb51ebceecace0839408793ad9e92689ba9730252",
+  "dst_sha256": "8db1599ba428bfd6ddd75adc30e82b2c6284b01620b9c5d145cf491f1e775cc6",
+  "dst_raw_records": 3901,
+  "dst_sewing_stitches": 3848,
+  "dst_trims": 9,
+  "dst_zero_stitches": 0,
+  "dst_stitches_under_0_2mm": 258,
+  "maximum_stitch_mm": 3.0,
+  "needle_size_mm": [
+    65.3,
+    53.8
+  ],
+  "raw_travel_size_mm": [
+    65.5,
+    54.0
+  ],
+  "dst_header_validated": true,
+  "sewing_excursions_beyond_region_plus_0_08mm": 0
+}

@@ -1,0 +1,104 @@
+{
+  "status": "draft_requires_review",
+  "physical_sewout": "not performed",
+  "independent_score": null,
+  "design_mm": [
+    80.0,
+    66.66666666666667
+  ],
+  "warnings": [
+    "Automatic raster import creates draft fill objects. Small lettering and narrow strokes need manual satin planning.",
+    "No physical sew-out has been performed. Verify hoop, fabric, stabilizer, needle and tension."
+  ],
+  "files": {
+    "pes": {
+      "sha256": "8d0e7cabfceaca2bf10c9d2bb51ebceecace0839408793ad9e92689ba9730252",
+      "bytes": 25268,
+      "command_counts": {
+        "JUMP": 18,
+        "TRIM": 17,
+        "STITCH": 3848,
+        "COLOR_CHANGE": 1,
+        "END": 1
+      },
+      "travel_bounds_mm": [
+        -31.3,
+        -28.5,
+        34.0,
+        25.3
+      ],
+      "travel_size_mm": [
+        65.3,
+        53.8
+      ],
+      "max_stitch_mm": 3.0000000000000036,
+      "short_stitches_under_0_5_mm": 756,
+      "zero_length_stitches": 9,
+      "untrimmed_transfers_over_2_mm": 0,
+      "final_end": true,
+      "palette_source": "PES thread sequence",
+      "threads": [
+        {
+          "sequence": 1,
+          "hex": "#286b62",
+          "description": "Color 1"
+        },
+        {
+          "sequence": 2,
+          "hex": "#c47939",
+          "description": "Color 2"
+        }
+      ],
+      "proof_note": "Illustrative 0.42 mm thread spread; not a physical sew-out."
+    },
+    "dst": {
+      "sha256": "8db1599ba428bfd6ddd75adc30e82b2c6284b01620b9c5d145cf491f1e775cc6",
+      "bytes": 12215,
+      "command_counts": {
+        "JUMP": 24,
+        "STITCH": 3848,
+        "TRIM": 9,
+        "COLOR_CHANGE": 1,
+        "END": 1
+      },
+      "travel_bounds_mm": [
+        -31.3,
+        -28.5,
+        34.2,
+        25.5
+      ],
+      "travel_size_mm": [
+        65.5,
+        54.0
+      ],
+      "max_stitch_mm": 3.0000000000000036,
+      "short_stitches_under_0_5_mm": 757,
+      "zero_length_stitches": 0,
+      "untrimmed_transfers_over_2_mm": 0,
+      "final_end": true,
+      "palette_source": "external thread chart",
+      "threads": [
+        {
+          "sequence": 1,
+          "hex": "#286b62",
+          "description": "Color 1"
+        },
+        {
+          "sequence": 2,
+          "hex": "#c47939",
+          "description": "Color 2"
+        }
+      ],
+      "proof_note": "Illustrative 0.42 mm thread spread; not a physical sew-out.",
+      "raw_records": 3901,
+      "header_ST": 3901,
+      "header_extents_tenths_mm": {
+        "+X": 342,
+        "-X": 313,
+        "+Y": 255,
+        "-Y": 285
+      },
+      "trim_convention": "three jump records; machine configuration determines cutting"
+    }
+  }
+}

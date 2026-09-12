@@ -1,0 +1,13 @@
+ARIADNE DRAFT — REVIEW AND TEST SEW BEFORE PRODUCTION
+
+Artwork envelope: 80.00 x 66.67 mm.
+Confirm actual machine travel bounds in review.json against your hoop's usable sewing area.
+Assumptions: stable woven fabric, suitable stabilizer, 40-weight thread.
+No machine or hoop has been selected; no physical sew-out has been performed.
+Load threads in threads.json order; DST does not embed these colors.
+DST uses three-jump trim requests: verify your machine's interpretation.
+Proofs show decoded stitches; thread spread is illustrative, not a sew-out.
+Edit plan.json geometry, object sequence, fill angles, spacing or explicit satin rails; export again to a NEW folder.
+
+Automatic raster import creates draft fill objects. Small lettering and narrow strokes need manual satin planning.
+No physical sew-out has been performed. Verify hoop, fabric, stabilizer, needle and tension.
