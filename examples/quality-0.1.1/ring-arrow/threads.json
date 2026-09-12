@@ -1,0 +1,10 @@
+{
+  "note": "DST has no embedded colors. This chart defines the proof and operator thread order.",
+  "threads": [
+    {
+      "sequence": 1,
+      "hex": "#142a37",
+      "description": "Color 1"
+    }
+  ]
+}
