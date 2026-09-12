@@ -1,6 +1,7 @@
 """Geometry-first draft digitization. Coordinates in editable plans are millimetres.
 
-Raster import makes fill objects, never guesses satin columns from lettering.
+Raster import makes fill objects and recognizes simple straight satin bars.
+It does not infer compound satin columns from lettering.
 An advanced editable plan can supply explicit paired satin rails.
 """
 
@@ -17,7 +18,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageOps
-from scipy.ndimage import label, find_objects
+from scipy.ndimage import label, find_objects, binary_erosion
 from shapely.geometry import LineString, Point, Polygon, shape, mapping
 from shapely import make_valid
 from skimage.measure import find_contours
@@ -40,6 +41,9 @@ class Settings:
     min_area_mm2: float = 0.6
     resolution: int = 768
     skip_corner_color: bool = False
+    background_mode: str = "auto"
+    trim_margins: bool = False
+    single_thread_color: str | None = None
 
     def validate(self):
         ranges = {"width_mm": (10, 400), "spacing_mm": (0.25, 1.2),
@@ -53,17 +57,77 @@ class Settings:
             value = getattr(self, key)
             if type(value) is not int or not low <= value <= high:
                 raise ValueError(f"{key} must be an integer between {low} and {high}.")
-        if type(self.underlay) is not bool or type(self.skip_corner_color) is not bool:
-            raise ValueError("underlay and skip_corner_color must be booleans.")
+        if any(type(getattr(self, name)) is not bool for name in ("underlay", "skip_corner_color", "trim_margins")):
+            raise ValueError("underlay, skip_corner_color and trim_margins must be booleans.")
+        if self.background_mode not in ("auto", "keep", "corner"):
+            raise ValueError("Background mode must be auto, keep or corner.")
+        if self.single_thread_color is not None and (not isinstance(self.single_thread_color, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", self.single_thread_color)):
+            raise ValueError("Single thread color must use #RRGGBB.")
         return self
 
 
 def _polygons(geometry):
+    if geometry.is_empty:
+        return
     if geometry.geom_type == "Polygon":
         yield geometry
     elif hasattr(geometry, "geoms"):
         for child in geometry.geoms:
             yield from _polygons(child)
+
+
+def _artwork_palette(pixels, opaque, maximum, background=None):
+    """Choose substantive interior hues, not a separate thread for edge shading."""
+    interior = binary_erosion(opaque, iterations=2)
+    reliable_interior = interior.sum() >= max(8, opaque.sum()*.2)
+    seeds = pixels[:, :, :3][interior if reliable_interior else opaque]
+    if not reliable_interior and background is not None:
+        # Erosion can erase thin dark stems while retaining only thick, pale
+        # antialias fringes. Use the stronger half of foreground contrast instead.
+        # A relative threshold preserves intentionally pale thin artwork too.
+        contrast = np.linalg.norm(seeds.astype(np.float32)-background, axis=1)
+        seeds = seeds[contrast >= np.quantile(contrast, .5)]
+    quant = Image.fromarray(seeds.reshape(1, -1, 3)).quantize(colors=64, method=Image.Quantize.MEDIANCUT)
+    lookup = quant.getpalette()
+    candidates = [(count, np.array(lookup[index*3:index*3+3], dtype=np.float32)) for count, index in quant.getcolors()]
+    chosen = []
+    for count, rgb in sorted(candidates, key=lambda item: item[0], reverse=True):
+        if not reliable_interior and background is not None and np.ptp(rgb) <= 12 and any(np.ptp(c) <= 12 for c in chosen):
+            # Sparse grayscale stems on paper acquire several gray edge shades;
+            # splitting these into thread groups breaks a single letter apart.
+            continue
+        if chosen and (count < max(3, len(seeds)*.005) or min(np.linalg.norm(rgb-c) for c in chosen) < 65):
+            continue
+        chosen.append(rgb)
+        if len(chosen) == maximum:
+            break
+    visible = pixels[:, :, :3][opaque].astype(np.float32)
+    distance = np.stack([np.sum((visible-color)**2, axis=1) for color in chosen], axis=1)
+    return np.array(chosen), distance.argmin(axis=1)
+
+
+def _straight_satin_bar(polygon):
+    """Recognize only a nearly rectangular narrow bar; never infer letter columns."""
+    if polygon.interiors:
+        return None
+    rectangle = polygon.minimum_rotated_rectangle
+    if rectangle.is_empty or rectangle.area <= 0 or polygon.area/rectangle.area < .995:
+        return None
+    corners = list(rectangle.exterior.coords)[:-1]
+    lengths = [math.dist(corners[i], corners[(i+1)%4]) for i in range(4)]
+    length, width = max(lengths), min(lengths)
+    if not .6 <= width <= 3 or length/width < 5:
+        return None
+    start = lengths.index(length)
+    a, b, c, d = [corners[(start+i)%4] for i in range(4)]
+    for inset in (0, .025, .05, .075, .1, .15, .2):
+        t = inset/length
+        interpolate = lambda p, q, f: tuple(x+(y-x)*f for x, y in zip(p, q))
+        left = [interpolate(a, b, t), interpolate(a, b, 1-t)]
+        right = [interpolate(d, c, t), interpolate(d, c, 1-t)]
+        if polygon.buffer(1e-7).covers(Polygon(left+list(reversed(right)))):
+            return {"type": "satin", "left": left, "right": right, "auto_stitch_type": "straight rectangular bar"}
+    return None
 
 
 def trace_image(source: str | Path, settings: Settings = Settings()) -> dict:
@@ -76,22 +140,70 @@ def trace_image(source: str | Path, settings: Settings = Settings()) -> dict:
         rgba = ImageOps.exif_transpose(original).convert("RGBA")
     original_size = rgba.size
     rgba.thumbnail((settings.resolution, settings.resolution), Image.Resampling.LANCZOS)
-    pixels = np.asarray(rgba)
+    pixels = np.asarray(rgba).copy()
     opaque = pixels[:, :, 3] >= 128
-    if not opaque.any():
-        raise ValueError("Image has no opaque artwork (alpha must be at least 128).")
-    # Quantize only visible pixels: invisible RGB values must not consume colors.
-    visible = Image.fromarray(pixels[:, :, :3][opaque].reshape(1, -1, 3))
-    quant = visible.quantize(colors=settings.colors, method=Image.Quantize.MEDIANCUT)
-    indices = np.full(opaque.shape, -1, dtype=np.int16)
-    indices[opaque] = np.asarray(quant).reshape(-1)
-    palette = quant.getpalette()
-    scale = settings.width_mm / rgba.width
-    warnings = ["Automatic raster import creates draft fill objects. Small lettering and narrow strokes need manual satin planning.",
+    warnings = ["Automatic raster import creates draft fills and simple straight satin bars. Compound lettering needs manual stitch planning.",
                 "No physical sew-out has been performed. Verify hoop, fabric, stabilizer, needle and tension."]
-    excluded = int(indices[0, 0]) if settings.skip_corner_color else -1
-    if settings.skip_corner_color and excluded < 0:
-        warnings.append("The top-left pixel is transparent; no palette color was excluded.")
+    # Background is an artwork-selection decision, before reducing thread colors.
+    # Removing a quantized class would erase ALL artwork when colors == 1.
+    mode = "corner" if settings.skip_corner_color else settings.background_mode
+    sampled_background = pixels[0, 0, :3].astype(np.float32)
+    removed = 0
+    if mode == "corner" and opaque[0, 0]:
+        distance = np.max(np.abs(pixels[:, :, :3].astype(float) - pixels[0, 0, :3]), axis=2)
+        background = opaque & (distance <= 32)
+        removed = int(background.sum())
+        opaque[background] = False
+        warnings.append("Pixels matching the top-left background were excluded before choosing thread colors, including matching interior areas.")
+    elif mode == "corner":
+        warnings.append("The top-left pixel is transparent; no additional background was removed.")
+    elif mode == "auto":
+        light = np.min(pixels[:, :, :3], axis=2) >= 235
+        border = np.concatenate((light[0], light[-1], light[:, 0], light[:, -1]))
+        border_opaque = np.concatenate((opaque[0], opaque[-1], opaque[:, 0], opaque[:, -1]))
+        if border_opaque.mean() > .9 and (border & border_opaque).mean() > .75:
+            background = opaque & light
+            removed = int(background.sum())
+            opaque[background] = False
+            warnings.append("Light paper background removed, including matching interior areas. Choose Keep background if those areas should be white thread.")
+    if removed:
+        pixels[~opaque, 3] = 0
+    if settings.trim_margins and opaque.any():
+        ys, xs = np.where(opaque)
+        pixels = pixels[ys.min():ys.max()+1, xs.min():xs.max()+1]
+        opaque = opaque[ys.min():ys.max()+1, xs.min():xs.max()+1]
+        rgba = Image.fromarray(pixels)
+    if not opaque.any():
+        raise ValueError("No opaque artwork remains. Choose Keep background or use an image with visible foreground shapes.")
+    # Count distinct foreground hues. A requested maximum is not a demand to
+    # turn antialias bands and slight shading into extra physical thread colors.
+    background_rgb = (np.array([255, 255, 255], dtype=np.float32) if mode == "auto" else sampled_background) if removed else None
+    if removed and binary_erosion(opaque, iterations=2).sum() < max(8, opaque.sum()*.2):
+        warnings.append("Thin raster strokes: edge colors may be ambiguous. For monochrome text, choose one thread and a thread color; use the original vector artwork for detailed lettering.")
+    colors, assigned = _artwork_palette(pixels, opaque, settings.colors, background_rgb)
+    indices = np.full(opaque.shape, -1, dtype=np.int16)
+    indices[opaque] = assigned
+    if removed:
+        rgb = pixels[:, :, :3][opaque].astype(np.float32)
+        foreground_rgb = colors[assigned]
+        vector = foreground_rgb-background_rgb
+        coverage = np.sum((rgb-background_rgb)*vector, axis=1) / np.maximum(1, np.sum(vector*vector, axis=1))
+        # Restore the half-coverage outline of antialiased art on paper. Pale
+        # fringe pixels outside that outline are background, not extra stitches.
+        keep = coverage >= .5
+        yy, xx = np.where(opaque)
+        opaque[yy[~keep], xx[~keep]] = False
+        indices[~opaque] = -1
+    palette = [int(value) for color in colors for value in color]
+    scale = settings.width_mm / rgba.width
+    if settings.colors == 1:
+        # A single thread follows the foreground silhouette. Use a real dominant
+        # foreground color, rather than averaging paper/antialias pixels into it.
+        if settings.single_thread_color:
+            palette[:3] = [int(settings.single_thread_color[i:i+2], 16) for i in (1, 3, 5)]
+        if not removed and opaque.all():
+            warnings.append("One thread with an opaque background creates a filled silhouette of the entire image. Remove the background to preserve the artwork shape.")
+    excluded = -1
     objects, threads, discarded = [], [], 0
     counts = [(int((indices == c).sum()), int(c)) for c in np.unique(indices) if c >= 0 and c != excluded]
     for _, c in sorted(counts, reverse=True):
@@ -119,10 +231,14 @@ def trace_image(source: str | Path, settings: Settings = Settings()) -> dict:
                 if polygon.area < settings.min_area_mm2:
                     discarded += 1
                     continue
-                group.append({"id": f"object-{len(objects)+len(group)+1}", "type": "fill",
+                obj = {"id": f"object-{len(objects)+len(group)+1}", "type": "fill",
                               "thread": thread_index, "geometry": mapping(polygon),
                               "angle_deg": settings.angle_deg,
-                              "spacing_mm": settings.spacing_mm, "underlay": settings.underlay})
+                              "spacing_mm": settings.spacing_mm, "underlay": settings.underlay}
+                bar = _straight_satin_bar(polygon)
+                if bar:
+                    obj.update(bar)
+                group.append(obj)
         if group:
             objects.extend(group)
             threads.append({"hex": "#" + "".join(f"{n:02X}" for n in rgb), "description": f"Color {thread_index+1}"})
@@ -132,6 +248,16 @@ def trace_image(source: str | Path, settings: Settings = Settings()) -> dict:
         raise ValueError("No objects remain. Lower minimum area or include the background color.")
     if discarded:
         warnings.append(f"Discarded {discarded} regions below the minimum area setting.")
+    if len(threads) < settings.colors:
+        warnings.append(f"Using {len(threads)} distinct foreground color(s); similar edge shades do not need extra threads.")
+    narrow = sum(shape(obj["geometry"]).buffer(-.3).is_empty for obj in objects)
+    bars = sum(obj.get("auto_stitch_type") == "straight rectangular bar" for obj in objects)
+    if bars:
+        warnings.append(f"Used satin across {bars} straight narrow rectangular bar(s). Compound lettering still needs manual stitch planning.")
+    if narrow:
+        warnings.append(f"Fine-detail warning: {narrow} shapes are too narrow for underlay. Small text may merge or lose counters; use larger, cleaner artwork or manual lettering digitization.")
+    if max(original_size) < 400:
+        warnings.append("Low-resolution source: enlarge the original vector artwork before importing; stretching this image cannot restore missing detail.")
     return {"schema": "ariadne-plan", "version": 1, "units": "mm", "status": "draft",
             "source": {"name": source.name, "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
                        "pixels": list(original_size)},
@@ -225,34 +351,70 @@ def fill_paths(polygon: Polygon, spacing: float, angle: float, stitch: float) ->
     """
     from shapely.affinity import rotate
     from shapely.ops import substring
+    if polygon.is_empty:
+        return []
+    if not polygon.is_valid or not all(math.isfinite(v) for v in polygon.bounds):
+        raise ValueError("Cannot plan stitches for invalid or non-finite fill geometry.")
     rotated = rotate(polygon, -angle, origin=(0, 0))
     covered = rotated.buffer(.00001)
     rings = [LineString(rotated.exterior.coords)] + [LineString(r.coords) for r in rotated.interiors]
+    # Put curved edge transfers a little inside the fill where possible. This
+    # avoids reproducing each raster staircase vertex as a needle penetration.
+    inner_rings = []
+    for part in _polygons(rotated.buffer(-.12)):
+        inner_rings.extend([LineString(part.exterior.coords)] + [LineString(r.coords) for r in part.interiors])
+
+    def ring_routes(ring, a, b):
+        da, db = ring.project(Point(a)), ring.project(Point(b))
+        lo, hi = sorted((da, db))
+        direct = list(substring(ring, lo, hi).coords)
+        around = list(substring(ring, hi, ring.length).coords) + list(substring(ring, 0, lo).coords)
+        if da > db:
+            direct.reverse()
+        else:
+            around.reverse()
+        return sorted((direct, around), key=lambda path: LineString(path).length if len(path) > 1 else 0)
+
+    def compact_route(route):
+        # Projection/contour vertices guide geometry; they are not all required
+        # needle positions. Skip a vertex only when the whole chord stays covered.
+        result, i = [route[0]], 0
+        while i < len(route)-1:
+            j = len(route)-1
+            while j > i+1 and not covered.covers(LineString([route[i], route[j]])):
+                j -= 1
+            result.append(route[j])
+            i = j
+        return result
 
     def connect(a, b):
         if math.dist(a, b) > 8:
             return None
         if covered.covers(LineString([a, b])):
             return [a, b]
+        for ring in inner_rings:
+            if ring.distance(Point(a)) > .4 or ring.distance(Point(b)) > .4:
+                continue
+            route = ring_routes(ring, a, b)[0]
+            smooth = list(LineString(route).simplify(.08).coords) if len(route) > 1 else route
+            candidate = [a] + smooth + [b]
+            if LineString(candidate).length <= 8 and covered.covers(LineString(candidate)):
+                return compact_route(candidate)
         # Follow the actual boundary between adjacent rows when a straight chord
         # would cut across a curved counter or fall outside a curved edge.
         for ring in rings:
             if ring.distance(Point(a)) > .0001 or ring.distance(Point(b)) > .0001:
                 continue
-            da, db = ring.project(Point(a)), ring.project(Point(b))
-            lo, hi = sorted((da, db))
-            direct = list(substring(ring, lo, hi).coords)
-            around = list(substring(ring, hi, ring.length).coords) + list(substring(ring, 0, lo).coords)
-            if da > db:
-                direct.reverse()
-            else:
-                around.reverse()
-            route = min((direct, around), key=lambda path: LineString(path).length)
-            if LineString(route).length <= 8:
+            route = ring_routes(ring, a, b)[0]
+            if len(route) > 1 and LineString(route).length <= 8:
                 # Trace vertices are not needle positions. A 0.03 mm geometric
                 # simplification stays below the machine's 0.1 mm coordinate grid.
-                route = list(LineString(route).simplify(.03).coords)
-                return [a] + route + [b]
+                smooth = list(LineString(route).simplify(.03).coords)
+                candidate = [a] + smooth + [b]
+                if not covered.covers(LineString(candidate)):
+                    candidate = [a] + route + [b]
+                if covered.covers(LineString(candidate)):
+                    return compact_route(candidate)
         return None
     xmin, ymin, xmax, ymax = rotated.bounds
     rows = max(1, math.ceil((ymax-ymin) / spacing))
@@ -296,6 +458,10 @@ def fill_paths(polygon: Polygon, spacing: float, angle: float, stitch: float) ->
                 distances.append(distance)
                 distance += stitch
             distances.append(length)
+            if len(distances) > 2 and distances[-1]-distances[-2] < .4:
+                distances.pop(-2)
+                if distances[-1]-distances[-2] > stitch:
+                    distances.insert(-1, (distances[-1]+distances[-2])/2)
             paths[index].extend([(a[0]+(b[0]-a[0])*d/length, y) for d in distances])
             next_active.append(index)
         active = next_active
@@ -313,6 +479,8 @@ class _Builder:
 
     def emit(self, command, point):
         x, y = point
+        if not math.isfinite(x) or not math.isfinite(y):
+            raise ValueError("Stitch planning produced a non-finite coordinate.")
         machine_x = round((x-self.plan["width_mm"]/2)*10)
         machine_y = round((y-self.plan["height_mm"]/2)*10)
         point = (machine_x/10+self.plan["width_mm"]/2, machine_y/10+self.plan["height_mm"]/2)
@@ -382,13 +550,7 @@ def digitize(plan: dict):
     settings = Settings(**plan.get("settings", {}))
     active_thread = None
     for obj in plan["objects"]:
-        index = obj["thread"]
-        if index != active_thread:
-            if active_thread is not None:
-                builder.emit(emb.COLOR_CHANGE, builder.cursor)
-            builder.pattern.add_thread({"hex": plan["threads"][index]["hex"], "description": plan["threads"][index].get("description", "")})
-            active_thread = index
-        start = len(builder.pattern.stitches)
+        paths = []
         if obj["type"] == "fill":
             polygon = shape(obj["geometry"])
             angle = obj.get("angle_deg", settings.angle_deg)
@@ -396,12 +558,26 @@ def digitize(plan: dict):
                 inset = polygon.buffer(-.3)
                 for part in _polygons(inset):
                     for path in fill_paths(part, 2.5, angle+90, settings.stitch_mm):
-                        builder.path(path, settings.stitch_mm)
+                        paths.append((path, settings.stitch_mm))
             for path in fill_paths(polygon, obj.get("spacing_mm", settings.spacing_mm), angle, settings.stitch_mm):
-                builder.path(path, settings.stitch_mm)
+                paths.append((path, settings.stitch_mm))
         else:
             for path in _satin_paths(obj):
-                builder.path(path, 7.0)
+                paths.append((path, 7.0))
+        paths = [(path, maximum) for path, maximum in paths if len(path) >= 2 and sum(math.dist(a, b) for a, b in zip(path, path[1:])) >= .3]
+        if not paths:
+            builder.spans.append({"id": obj.get("id", ""), "start": len(builder.pattern.stitches),
+                                  "end": len(builder.pattern.stitches), "skipped": "too small for usable stitches"})
+            continue
+        index = obj["thread"]
+        if index != active_thread:
+            if active_thread is not None:
+                builder.emit(emb.COLOR_CHANGE, builder.cursor)
+            builder.pattern.add_thread({"hex": plan["threads"][index]["hex"], "description": plan["threads"][index].get("description", "")})
+            active_thread = index
+        start = len(builder.pattern.stitches)
+        for path, maximum in paths:
+            builder.path(path, maximum)
         builder.spans.append({"id": obj.get("id", ""), "start": start, "end": len(builder.pattern.stitches)})
     if not any((s[2] & emb.COMMAND_MASK) == emb.STITCH for s in builder.pattern.stitches):
         raise ValueError("Objects are too small to produce usable stitches.")

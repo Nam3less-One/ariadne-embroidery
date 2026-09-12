@@ -23,7 +23,9 @@ def main(argv=None):
         p.add_argument("--angle", type=float, default=0)
         p.add_argument("--min-area", type=float, default=.6, help="Discard regions smaller than this area in mm²")
         p.add_argument("--no-underlay", action="store_true")
-        p.add_argument("--skip-corner-color", action="store_true", help="Exclude the whole palette color at the top-left pixel")
+        p.add_argument("--skip-corner-color", action="store_true", help="Alias for --background corner: exclude matching pixels before choosing thread colors")
+        p.add_argument("--background", choices=("auto", "keep", "corner"), default="auto", help="Remove light paper automatically, keep background, or exclude matching corner pixels")
+        p.add_argument("--trim-margins", action="store_true", help="Fit the design width to the foreground artwork")
         if name == "convert":
             p.add_argument("--format", nargs="+", choices=("pes", "dst"), default=["pes", "dst"])
     p = commands.add_parser("export", help="Digitize an edited plan into a new bundle")
@@ -40,7 +42,7 @@ def main(argv=None):
         if args.command in ("convert", "trace"):
             settings = Settings(width_mm=args.width, colors=args.colors, spacing_mm=args.spacing,
                                 angle_deg=args.angle, min_area_mm2=args.min_area, underlay=not args.no_underlay,
-                                skip_corner_color=args.skip_corner_color)
+                                skip_corner_color=args.skip_corner_color, background_mode=args.background, trim_margins=args.trim_margins)
             if args.command == "convert":
                 result = convert_image(args.image, args.output, settings, args.format)
             else:
