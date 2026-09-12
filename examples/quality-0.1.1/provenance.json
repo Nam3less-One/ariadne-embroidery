@@ -1,0 +1,18 @@
+{
+  "controlled_inputs": {
+    "files": [
+      "01-ring-arrow-white.png",
+      "02-three-color-botanical-transparent.png",
+      "03-narrow-monogram-white.png"
+    ],
+    "origin": "Original deterministic antialiased QA artwork drawn programmatically for Ariadne, not a customer logo.",
+    "license": "CC0-1.0"
+  },
+  "generated_input": {
+    "file": "04-grow-generated.png",
+    "origin": "Created with the built-in OpenAI image-generation tool for this original fictional GROW garden-shop test.",
+    "prompt": "generated-input-prompt.txt",
+    "note": "Actual output is transparent and has subtle color variation; preserved unedited as a realistic stress input. Supplied with this MIT-licensed project; no existing brand was used."
+  },
+  "date": "2026-09-12"
+}
