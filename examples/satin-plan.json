@@ -1,0 +1,55 @@
+{
+  "schema": "ariadne-plan",
+  "version": 1,
+  "units": "mm",
+  "status": "draft",
+  "width_mm": 40,
+  "height_mm": 40,
+  "settings": {},
+  "threads": [
+    {
+      "hex": "#286B62",
+      "description": "Deep teal"
+    }
+  ],
+  "objects": [
+    {
+      "id": "satin-column",
+      "type": "satin",
+      "thread": 0,
+      "left": [
+        [
+          8,
+          5
+        ],
+        [
+          8,
+          30
+        ],
+        [
+          28,
+          30
+        ]
+      ],
+      "right": [
+        [
+          12,
+          5
+        ],
+        [
+          12,
+          26
+        ],
+        [
+          28,
+          26
+        ]
+      ],
+      "spacing_mm": 0.4,
+      "underlay": true
+    }
+  ],
+  "warnings": [
+    "Original demonstration of paired satin rails. Review the corner and test sew."
+  ]
+}
