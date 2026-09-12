@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 — 2026-09-12
+
+- Fixed the NaN crash caused by narrow regions whose underlay collapses to empty geometry.
+- Remove background pixels before choosing thread colors, preserving one-color silhouettes and counters.
+- Choose substantive foreground hues instead of allocating threads to antialias fringes; merge similar shading and retain actual color counts.
+- Restore half-coverage outlines on light paper, skip unusable thread groups, and simplify covered edge transfers without crossing holes.
+- Recognize simple narrow rectangular bars for satin and avoid sparse text-edge pixels dominating the one-thread palette.
+- Added automatic/keep/corner background modes, optional margin trimming, and a one-thread color picker.
+- Added prepared-artwork preview, separate decoded stitch proof, output-folder access, stale-result invalidation and fine-detail warnings.
+- Improved fit-to-view image scaling and moved advanced stitch settings into a separate dialog for small windows.
+- Added independent regression fixtures and GUI workflow checks. See the release validation document for exact review scores and limits.
+
 ## 0.1.0 — 2026-09-12
 
 Initial public source release candidate.

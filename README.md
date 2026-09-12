@@ -6,9 +6,9 @@ Ariadne 0.1 is a geometry-based converter, not a trained AI model. Automatic ras
 
 ## Install and launch
 
-**Windows:** [Download the Windows x64 installer](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.0/Ariadne-0.1.0-Windows-x64-Setup.exe), run it, then open **Ariadne** from the Start menu. Python and the required libraries are included. Requires 64-bit Windows 10 or newer; this installer is unsigned.
+**Windows:** [Download the Windows x64 installer](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.1/Ariadne-0.1.1-Windows-x64-Setup.exe), run it, then open **Ariadne** from the Start menu. Python and the required libraries are included. Requires 64-bit Windows 10 or newer; this installer is unsigned.
 
-Start with the [small-business guide](docs/SMALL_BUSINESS_START.md). Version 0.1.0 is early access; every design needs review and test sewing.
+Start with the [small-business guide](docs/SMALL_BUSINESS_START.md). Version 0.1.1 is early access; every design needs review and test sewing.
 
 ### Install from source (developers, macOS and Linux)
 
@@ -34,16 +34,16 @@ macOS / Linux:
 .venv/bin/ariadne-studio
 ```
 
-Or install the supplied wheel with `python -m pip install path/to/ariadne_embroidery-0.1.0-py3-none-any.whl`, then run `ariadne gui`. The source archives and wheel are separate from the Windows installer.
+Or install the supplied wheel with `python -m pip install path/to/ariadne_embroidery-0.1.1-py3-none-any.whl`, then run `ariadne gui`. The source archives and wheel are separate from the Windows installer.
 
 ## Make a design
 
-1. Open PNG, JPEG, WebP, BMP or TIFF artwork. Transparent pixels remain unstitched; alpha below 128 is treated as transparent. Crop screenshot margins before importing.
-2. Set canvas width, color count, fill spacing and direction. Width includes transparent margins. The actual stitch and travel dimensions appear in the exported audit.
-3. Choose **Create PES + DST bundle** and a parent directory. Each result gets a new folder; previous designs are preserved.
+1. Open PNG, JPEG, WebP, BMP or TIFF artwork. Transparent pixels remain unstitched; alpha below 128 is treated as transparent.
+2. Choose a background mode, finished width and maximum thread colors. The desktop defaults to removing light paper and fitting width to the foreground. Turn off margin trimming to use the full image canvas. Similar edge shades are combined, so actual colors may be fewer than requested.
+3. Choose **Preview colors & shape** to check foreground selection, counters and the actual palette. Choose **Export PES + DST** and a parent folder. Each result gets a new folder; previous designs are preserved. Use **Open output folder** to find them.
 4. Inspect decoded proof, needle and travel images. Read `SETUP.txt` and `review.json`, verify the usable hoop area and thread order, and test sew on matching materials.
 
-`Exclude top-left palette color` omits **every region** assigned that palette color, including interior regions. It is not background recognition. Start with a transparent source when possible.
+Background selection happens before color reduction. **Auto** removes a mostly light paper border and matching interior areas; **Keep** stitches the background; **Remove color at top-left** removes matching pixels throughout the artwork. Inspect the preview when white or background-colored details are intentional. One thread creates a foreground silhouette in the chosen swatch. Tiny raster text may still need larger clean artwork and manual satin digitization.
 
 ## Command line
 
