@@ -1,0 +1,38 @@
+name: Installation or embroidery problem
+description: Help us reproduce an Ariadne problem without sharing private customer artwork.
+title: "[Problem] "
+body:
+  - type: markdown
+    attributes:
+      value: "Please include only information and artwork you can share publicly. A digital preview cannot establish a physical sew-out result."
+  - type: input
+    id: version
+    attributes:
+      label: Ariadne version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and Python version
+      placeholder: "Windows 11, Python 3.14"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include steps, settings and the exact error, if any.
+    validations:
+      required: true
+  - type: textarea
+    id: machine
+    attributes:
+      label: Machine and materials, if this concerns sewing
+      description: Model, hoop, fabric, stabilizer, needle and thread. Say whether this is a digital preview or physical sew-out.
+  - type: textarea
+    id: example
+    attributes:
+      label: Shareable example
+      description: An original simple sample is best. Do not upload private customer files or personal account information.
