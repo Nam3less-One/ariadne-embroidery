@@ -12,6 +12,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -92,9 +93,10 @@ def build(args):
     lines += [f'RMDir "$INSTDIR\\{nsis_quote(p.relative_to(app))}"' for p in dirs]
     uninstall = work / "uninstall-files.nsh"
     uninstall.write_text("\n".join(lines), encoding="utf-8")
-    setup = args.output / "Ariadne-0.1.0-Windows-x64-Setup.exe"
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    setup = args.output / f"Ariadne-{version}-Windows-x64-Setup.exe"
     command = [str(args.nsis), f"/DAPP_DIR={app}", f"/DOUTPUT_FILE={setup}",
-               f"/DUNINSTALL_FILES={uninstall}", str(Path(__file__).with_name("installer.nsi"))]
+               f"/DAPP_VERSION={version}", f"/DUNINSTALL_FILES={uninstall}", str(Path(__file__).with_name("installer.nsi"))]
     with (args.output / "installer-build.log").open("w", encoding="utf-8") as log:
         subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True)
     (args.output / "WINDOWS-SHA256SUMS.txt").write_text(
