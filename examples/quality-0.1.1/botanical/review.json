@@ -1,0 +1,149 @@
+{
+  "input": "02-three-color-botanical-transparent.png",
+  "fidelity": 8.7,
+  "digitizing_quality": 8.2,
+  "review_type": "Independent digital review of decoded PES/DST with comparison screenshot inspection",
+  "physical_sewout": "not performed",
+  "settings": {
+    "width_mm": 100,
+    "colors": 4,
+    "spacing_mm": 0.42,
+    "stitch_mm": 3.0,
+    "angle_deg": 0.0,
+    "underlay": true,
+    "min_area_mm2": 0.6,
+    "resolution": 768,
+    "skip_corner_color": false,
+    "background_mode": "auto",
+    "trim_margins": true,
+    "single_thread_color": null
+  },
+  "design_mm": [
+    100,
+    101.69491525423729
+  ],
+  "actual_threads": 3,
+  "reason": "Clean broad fill, preserved silhouette and appropriate underlay; 3-color version restores center and leaf/petal distinction. Restricted budgets intentionally lose full-source color identity.",
+  "files": {
+    "pes": {
+      "sha256": "defb1769d3adbff1e918d481b2659f6d8347efdae2197906bcc9127a41f0177b",
+      "audit": {
+        "sha256": "defb1769d3adbff1e918d481b2659f6d8347efdae2197906bcc9127a41f0177b",
+        "bytes": 62015,
+        "command_counts": {
+          "JUMP": 44,
+          "TRIM": 43,
+          "STITCH": 9835,
+          "COLOR_CHANGE": 2,
+          "END": 1
+        },
+        "travel_bounds_mm": [
+          -50.0,
+          -50.6,
+          50.0,
+          50.6
+        ],
+        "travel_size_mm": [
+          100.0,
+          101.2
+        ],
+        "max_stitch_mm": 3.0000000000000036,
+        "short_stitches_under_0_5_mm": 449,
+        "short_stitches_under_0_2_mm": 116,
+        "zero_length_stitches": 22,
+        "untrimmed_transfers_over_2_mm": 0,
+        "final_end": true,
+        "palette_source": "PES thread sequence",
+        "threads": [
+          {
+            "hex": "#db7460",
+            "description": "Color 1"
+          },
+          {
+            "hex": "#2d7353",
+            "description": "Color 2"
+          },
+          {
+            "hex": "#e9b840",
+            "description": "Color 3"
+          }
+        ],
+        "proof_note": "Illustrative 0.42 mm thread spread; not a physical sew-out."
+      },
+      "independent_path_metrics": {
+        "segments_outside_planned_geometry_plus_0_08mm": 0,
+        "source_silhouette_planned_geometry_iou": 0.9892,
+        "max_penetrations_within_0_5mm": 11,
+        "short_positive_under_0_2_mm_percent": 1.18,
+        "source_silhouette_illustrative_stitch_mask_iou": 0.8349,
+        "note": "IoU uses 0.42 mm illustrative thread width at original image resolution; pixel aliasing affects coverage and this is not a physical coverage metric. White or transparent source background excluded. One/two-color botanical color loss is intentional at a restricted budget."
+      }
+    },
+    "dst": {
+      "sha256": "d1486b9361d8eb64071b22a5b7b48dbaacacafa2f98fe300b03b7eb412445bb2",
+      "audit": {
+        "sha256": "d1486b9361d8eb64071b22a5b7b48dbaacacafa2f98fe300b03b7eb412445bb2",
+        "bytes": 30395,
+        "command_counts": {
+          "JUMP": 57,
+          "STITCH": 9835,
+          "TRIM": 22,
+          "COLOR_CHANGE": 2,
+          "END": 1
+        },
+        "travel_bounds_mm": [
+          -50.0,
+          -50.6,
+          50.0,
+          50.8
+        ],
+        "travel_size_mm": [
+          100.0,
+          101.4
+        ],
+        "max_stitch_mm": 3.0000000000000036,
+        "short_stitches_under_0_5_mm": 450,
+        "short_stitches_under_0_2_mm": 116,
+        "zero_length_stitches": 0,
+        "untrimmed_transfers_over_2_mm": 0,
+        "final_end": true,
+        "palette_source": "external thread chart",
+        "threads": [
+          {
+            "sequence": 1,
+            "hex": "#db7460",
+            "description": "Color 1"
+          },
+          {
+            "sequence": 2,
+            "hex": "#2d7353",
+            "description": "Color 2"
+          },
+          {
+            "sequence": 3,
+            "hex": "#e9b840",
+            "description": "Color 3"
+          }
+        ],
+        "proof_note": "Illustrative 0.42 mm thread spread; not a physical sew-out.",
+        "raw_records": 9961,
+        "header_ST": 9961,
+        "header_extents_tenths_mm": {
+          "+X": 500,
+          "-X": 500,
+          "+Y": 508,
+          "-Y": 506
+        },
+        "trim_convention": "three jump records; machine configuration determines cutting"
+      },
+      "independent_path_metrics": {
+        "segments_outside_planned_geometry_plus_0_08mm": 0,
+        "source_silhouette_planned_geometry_iou": 0.9892,
+        "max_penetrations_within_0_5mm": 11,
+        "short_positive_under_0_2_mm_percent": 1.18,
+        "source_silhouette_illustrative_stitch_mask_iou": 0.8349,
+        "note": "IoU uses 0.42 mm illustrative thread width at original image resolution; pixel aliasing affects coverage and this is not a physical coverage metric. White or transparent source background excluded. One/two-color botanical color loss is intentional at a restricted budget."
+      }
+    }
+  }
+}
