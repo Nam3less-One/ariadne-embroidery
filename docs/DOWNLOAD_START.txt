@@ -1,0 +1,25 @@
+ARIADNE EMBROIDERY STUDIO 0.1.0
+Free early-access source release for embroidery drafting
+
+START HERE
+
+1. Extract ariadne-embroidery-0.1.0-source.zip.
+2. Open README.md in the extracted source folder.
+3. Follow docs/SMALL_BUSINESS_START.md for installation and a first sample.
+
+This release includes a desktop app but requires Python 3.11 or newer and
+installation of its open-source dependencies. It is not a standalone installer.
+After installation, conversion runs locally without an account or paid API.
+
+The .whl file is for Python package installation. The .tar.gz file is another
+source distribution. These program packages do not go onto an embroidery
+machine. Create a design in Ariadne, then use the exported PES or DST file.
+
+Business use is permitted under the included MIT License. You need appropriate
+rights to the artwork you import. Review every output and test sew on the
+intended fabric and machine before using a design for a customer order.
+
+The included digital review covers only the original geometric example.
+No physical sew-out or general production certification is claimed.
+
+SHA256SUMS.txt contains hashes for the files in this download bundle.
