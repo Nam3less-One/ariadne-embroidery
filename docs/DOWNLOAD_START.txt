@@ -1,9 +1,9 @@
-ARIADNE EMBROIDERY STUDIO 0.1.0
+ARIADNE EMBROIDERY STUDIO 0.1.1
 Free early-access source release for embroidery drafting
 
 START HERE
 
-1. Extract ariadne-embroidery-0.1.0-source.zip.
+1. Extract ariadne-embroidery-0.1.1-source.zip.
 2. Open README.md in the extracted source folder.
 3. Follow docs/SMALL_BUSINESS_START.md for installation and a first sample.
 

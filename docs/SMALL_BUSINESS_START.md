@@ -4,7 +4,7 @@ Ariadne creates editable embroidery drafts from simple artwork and exports PES a
 
 ## Is this release right for you?
 
-Version 0.1.0 is early access. On 64-bit Windows 10 or newer, use the **Windows installer**; it includes Python and the required libraries. Source packages remain available for developers and other operating systems. For advanced lettering and visual editing, [Ink/Stitch](https://inkstitch.org/) is another free open-source option to investigate.
+Version 0.1.1 is early access. On 64-bit Windows 10 or newer, use the **Windows installer**; it includes Python and the required libraries. Source packages remain available for developers and other operating systems. For advanced lettering and visual editing, [Ink/Stitch](https://inkstitch.org/) is another free open-source option to investigate.
 
 Start with a few solid colors, large clear shapes and a transparent background. Photographs, gradients and tiny text require significant editing and experienced digitizing.
 
@@ -12,17 +12,17 @@ Start with a few solid colors, large clear shapes and a transparent background. 
 
 | Download | Purpose |
 | --- | --- |
-| `Ariadne-0.1.0-Windows-x64-Setup.exe` | Recommended for Windows: setup wizard, Start menu shortcut, bundled Python |
-| `ariadne-embroidery-0.1.0-source.zip` | Source installation with examples and instructions |
-| `ariadne_embroidery-0.1.0-py3-none-any.whl` | Installation by someone familiar with Python packages |
-| `ariadne_embroidery-0.1.0.tar.gz` | Source packaging and developer workflows |
+| `Ariadne-0.1.1-Windows-x64-Setup.exe` | Recommended for Windows: setup wizard, Start menu shortcut, bundled Python |
+| `ariadne-embroidery-0.1.1-source.zip` | Source installation with examples and instructions |
+| `ariadne_embroidery-0.1.1-py3-none-any.whl` | Installation by someone familiar with Python packages |
+| `ariadne_embroidery-0.1.1.tar.gz` | Source packaging and developer workflows |
 | `SHA256SUMS.txt` | Verify release file checksums |
 
 If you downloaded the combined release ZIP, extract it, then extract the source ZIP inside. The folder containing `README.md` and `pyproject.toml` is the source folder. Do not send the program ZIP to an embroidery machine: only the exported machine file belongs there.
 
 ## Install once on Windows
 
-1. [Download the setup program](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.0/Ariadne-0.1.0-Windows-x64-Setup.exe).
+1. [Download the setup program](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.1/Ariadne-0.1.1-Windows-x64-Setup.exe).
 2. Run it and follow the setup wizard. The installer is unsigned.
 3. Open **Ariadne** from the Windows Start menu. No Python setup or commands are required.
 
@@ -42,9 +42,9 @@ Installation downloads open-source dependencies. Conversion runs locally afterwa
 
 ## Make your first sample
 
-Open `examples/geometric-mark.png`. Set width to 80 mm, colors to 2 and fill spacing to 0.4 mm, leaving support underlay enabled. Choose **Create PES + DST bundle**, then a parent folder. Ariadne creates a new output folder and shows the decoded PES proof.
+Open `examples/geometric-mark.png`. Set width to 80 mm and maximum colors to 2. Use **Stitch settings** for 0.4 mm spacing and support underlay. Turn off margin trimming to reproduce the older example's full-canvas dimensions. Choose **Preview colors & shape**, check the foreground and palette, then **Export PES + DST** and a parent folder. Ariadne creates a new output folder and shows its decoded stitch proof. Use **Open output folder** to find the files.
 
-Width describes the entire image canvas, including transparent margins. The example's shapes occupy less space than its 80 mm canvas. Read the actual machine travel dimensions before selecting a hoop.
+With **Fit width to artwork** enabled, the finished width applies to the foreground. With it disabled, width includes the entire canvas and margins. Read the actual machine travel dimensions before selecting a hoop. A maximum of four colors may use only one or two real foreground hues; this prevents edge smoothing from turning into unnecessary thread changes.
 
 The output contains `design.pes`, `design.dst`, a thread chart, editable `plan.json`, proofs and setup notes. Use the format supported by your machine. A matching extension alone does not establish hoop or machine compatibility.
 

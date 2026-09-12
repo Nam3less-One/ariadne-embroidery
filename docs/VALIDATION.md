@@ -1,23 +1,34 @@
-# Release validation — 0.1.0
+# Release validation — 0.1.1
 
-## Local verification
+## Regression and GUI checks
 
-Environment: Windows, CPython 3.14.4, Tk 8.6. The automated suite passes 15 tests, covering transparency, color assignment, hole retention, fill routes at four angles, malformed settings, format rejection, non-overwrite behavior, failed-bundle cleanup, satin export, machine-file round trips, raw DST extents/counts and suppression of duplicate DST penetrations.
+Windows, CPython 3.14.4, Tk 8.6: **53 tests passed with no skips**. This includes 36 color/geometry regression cases and three real Tk worker tests. Coverage includes one/two/four-color exports, collapsed underlay, empty thread groups, finite coordinates, PES/DST round trips, preserved counters, background selection before quantization, shading, sparse raster strokes, explicit swatches, invalid settings, preview invalidation, export recovery and output-folder access.
 
-The Tk workflow test opens original sample artwork, runs the real conversion worker, decodes its result, populates the proof panel and clears stale results when new artwork is opened. The desktop automation service did not expose the running app window, so a manual/screenshot desktop layout review is still outstanding. This is distinct from the independently captured machine-file proof screenshot below.
+A separate diagnostic critic checked 20 curved routing cases at five angles, including a 0.2 mm ring: every segment stayed within geometry plus 0.000001 mm and obeyed the configured 3 mm limit. A test isolation issue was corrected by sharing one Tk interpreter and using fresh windows, matching the real app; unexpected Tcl initialization errors are no longer silently skipped as unavailable displays.
 
-The CI matrix is provided for Windows and Linux, Python 3.11 and 3.14. Remote CI has not run before public repository creation. On hosts without a display the Tk test is explicitly skipped. No macOS or physical embroidery machine result is claimed.
+An independent critic inspected the actual Windows app, including file selection, one-thread preview, export with multiple colors allowed, stale-result clearing and output-folder launch. The GUI improved from **4.5/10** to **8.2/10** after an intermediate 7.5 review identified clipped controls and low-contrast palette labels. The final normal and minimum layouts and separate advanced-settings dialog were screenshot-reviewed. Source and prepared images fit independently; synchronized zoom and a graphical object editor remain future work.
 
 ## Independent embroidery review
 
-The original geometric example was revised across three independent reviews: quality 6.6, then 7.3, then **8.0/10**, with final source fidelity **8.4/10**. The fixes reduced trims, removed duplicate DST penetrations, and corrected DST extents to include raw trim movements.
+Four original inputs, including one generated GROW graphic, were repeatedly exported and freshly decoded. Critique drove stable palettes, fewer short edge stitches, covered transfers and satin on a bounded straight bar. An intermediate routing revision was rejected when it increased short stitches. Final checks ran twelve one/multi-color cases; the exact four default results below and their hashes are included in [the reviewed examples](../examples/quality-0.1.1/review.md).
 
-The exact reviewed files, screenshots, advice and hashes are in [the example review](../examples/reviewed-geometric/review.md). It uses an 80 mm-wide canvas and 0.4 mm row spacing. The actual raw machine travel is 65.5 × 54.0 mm because the original image has transparent margins. The sample retains 258 positive stitches below 0.2 mm; reducing short edge fragments remains future refinement. No physical sew-out has been performed.
+| Default sample | Source fidelity / 10 | Digitizing quality / 10 |
+|---|---:|---:|
+| Ring-arrow | 8.7 | 8.1 |
+| Three-color botanical | 8.7 | 8.2 |
+| Narrow monogram | 8.2 | 8.0 |
+| Generated GROW | 8.5 | 8.0 |
 
-Scores apply only to the included sample. New app output remains an unreviewed draft regardless of those scores.
+Setup: 100 mm cropped artwork width, automatic background, margin trimming on, up to four threads, 0.42 mm row spacing and underlay on. Scores apply only to those exact digital files. GROW retains about 5.8% positive stitches below 0.2 mm and is about 100 × 109.9 mm before trim travel; it requires a larger usable hoop than 100 × 100 mm.
 
-## Distribution boundary
+A private 186 × 79 pixel equation screenshot reproduced the reported crash. It now exports at one, two and four colors, but its tiny lettering remains below the professional gate: independent monochrome quality assessments were 5.5 and 6.5/10. Extra threads can misinterpret colored text-rendering fringes and fragment letters. The app warns about thin raster strokes and low resolution; use one chosen thread for monochrome artwork and larger original artwork or manual lettering for a credible finished design. The private source is excluded from the release.
 
-The source ZIP/sdist and pure-Python wheel include only Ariadne source, documentation and original geometric examples. Runtime dependencies are installed separately. Private studio artwork, previous third-party logos, browser profiles, credentials and local absolute file paths are excluded. Build and installed-wheel checks are recorded alongside release artifacts.
+**No physical sew-out was performed.** These scores do not certify tension, fabric behavior, registration, machine compatibility or arbitrary future designs. Every automatic result remains an unreviewed draft.
 
-The wheel was installed into a separate virtual environment with its declared dependencies; `pip check`, the installed command-line entry point and a complete sample conversion passed. The installed wheel regenerated the reviewed PES/DST byte-for-byte. Both wheel and sdist pass `twine check` metadata validation. Installation required a network step for dependencies; the subsequent wheel install and conversion were performed offline.
+## Windows distribution
+
+The exact 0.1.1 x64 installer was built with PyInstaller 6.22.2 and NSIS 3.12. Its isolated installation test passed with existing app registration preserved. The installed frozen runtime, with external Python/Tcl environment variables removed and PATH restricted to Windows System32, completed real GUI-worker previews and PES/DST exports at requested color limits 1, 2 and 4. Actual thread counts were 1, 2 and 2. Uninstall removed installed files while preserving an unrelated test file. The release's WINDOWS-VALIDATION.json and checksums identify the tested installer.
+
+The installer includes Python, required libraries, dependency notices and corresponding GEOS source. It is unsigned and installs per user. Source ZIP, sdist and pure-Python wheel are separate distributions. The public source whitelist excludes private studio images, browser profiles, credentials and local absolute paths.
+
+Windows/Linux CI on Python 3.11 and 3.14 is configured in the repository. Consult the Actions run for the release commit for its actual status; headless hosts explicitly skip GUI display checks. No macOS execution or physical machine result is claimed. The earlier 0.1.0 geometric review remains available as historical evidence in examples/reviewed-geometric; it is not the new default sample setup.

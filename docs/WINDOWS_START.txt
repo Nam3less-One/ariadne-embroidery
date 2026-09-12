@@ -1,19 +1,25 @@
 ARIADNE EMBROIDERY STUDIO — WINDOWS
 
-Run Ariadne-0.1.0-Windows-x64-Setup.exe and follow the setup wizard.
+Run Ariadne-0.1.1-Windows-x64-Setup.exe and follow the setup wizard.
 Then open Ariadne from the Windows Start menu.
 Python and the required libraries are included. No separate Python installation,
 terminal commands, account or paid subscription are needed.
 Requires 64-bit Windows 10 or newer. This installer is not code-signed.
 
-1. Click Open artwork or plan and choose a simple logo image.
-2. Set the finished width, thread colors and fill settings.
-3. Click Create PES + DST bundle and choose a folder for your work.
-4. Review the decoded proof, SETUP.txt and thread chart in the saved folder.
+1. Click Open artwork and choose a simple logo image.
+2. Choose the background mode, finished width and maximum thread colors.
+   Auto removes light paper before counting colors. Keep stitches the background.
+   Fit width to artwork trims empty margins. One color uses the selected swatch.
+3. Click Preview colors & shape. Check holes, foreground and the actual palette.
+4. Click Export PES + DST, choose a folder, then use Open output folder.
+   Review the decoded stitch proof, SETUP.txt and thread chart in that folder.
 5. Verify hoop fit and test sew before using a design in production.
 
 Your artwork stays on your computer. Automatic import creates editable drafts;
 small lettering and complex shapes may need manual digitizing adjustments.
+Fine-detail and low-resolution warnings identify artwork that needs a cleaner,
+larger source or manual lettering. Raising the color limit does not add useful
+detail to tiny text. Similar edge shades are combined into the same thread.
 No physical sew-out or machine certification has been completed.
 
 Uninstall through Windows Settings > Apps > Installed apps.

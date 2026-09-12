@@ -24,7 +24,8 @@ This app automates tracing, planning, encoding and proof generation. Concept gen
 ## Known limitations in 0.1
 
 - Photographs, gradients, tiny text and detailed multicolor artwork can trace poorly. Simplify artwork and inspect discarded regions.
-- Raster import produces fill objects. Narrow lettering requires manually planned satin columns; automatic column inference is future work.
+- Raster import produces fills and recognizes nearly rectangular straight bars for satin. Compound lettering still requires manually planned columns; general automatic column inference is future work.
+- Tiny screenshots can contain colored text-rendering fringes. For monochrome art, use one thread and choose its color. Low-resolution geometry cannot be restored by enlarging the screenshot.
 - Fills use a single angle per object. Boundary routing reduces trims but may accumulate stitches around counters. Audit and adjust challenging geometry.
 - No automatic pull compensation, fabric simulation, hoop database, machine connection, thread-brand matching or batch background monitoring.
 - No graphical object editor, SVG/PDF import, physical machine certification or signed executable.

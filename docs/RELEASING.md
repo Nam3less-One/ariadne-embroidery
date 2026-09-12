@@ -20,7 +20,7 @@ Create the chosen public repository, push this source as its root, and run the p
 - Run Windows/Linux CI and record which environments actually passed. Run the Tk GUI checks with a display.
 - Review licensing, original sample provenance, archive contents and dependency notices.
 - Confirm the README matches the shipped capabilities and keeps draft/sew-out limitations visible.
-- Create tag `v0.1.0` for the reviewed commit and attach source ZIP, wheel, sdist and SHA-256 checksums to a GitHub release.
+- Create the version tag for the reviewed commit and attach the Windows installer, source ZIP, wheel, sdist and SHA-256 checksums to a GitHub release. Build and verify the installer using `docs/BUILD_WINDOWS.md`.
 - Use the release description in `docs/RELEASE_NOTES.md`; update any candidate language after publishing.
 
 The CI workflow builds downloadable artifacts but does not automatically publish to PyPI or create releases. Optional PyPI publication requires an available package name and the maintainer's account configuration; installation from the supplied wheel works without PyPI hosting.
