@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ariadne-embroidery"
+version = "0.1.0"
+description = "Free, offline image-to-embroidery drafting with editable plans and decoded proofs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{name = "Project Ariadne contributors"}]
+dependencies = ["Pillow>=10.4,<13", "numpy>=1.26,<3", "scipy>=1.12,<2", "shapely>=2.0,<3", "scikit-image>=0.23,<1", "pyembroidery==1.5.1"]
+classifiers = ["Development Status :: 4 - Beta", "Programming Language :: Python :: 3", "Topic :: Multimedia :: Graphics", "Operating System :: OS Independent"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "build>=1", "twine>=6"]
+
+[project.scripts]
+ariadne = "ariadne_embroidery.cli:main"
+
+[project.gui-scripts]
+ariadne-studio = "ariadne_embroidery.gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
