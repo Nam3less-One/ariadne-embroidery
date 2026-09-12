@@ -6,7 +6,11 @@ Ariadne 0.1 is a geometry-based converter, not a trained AI model. Automatic ras
 
 ## Install and launch
 
-**New to embroidery software installation? Start with the [small-business guide](docs/SMALL_BUSINESS_START.md).** Version 0.1.0 is an early-access source release; every design needs review and test sewing.
+**Windows:** [Download the Windows x64 installer](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.0/Ariadne-0.1.0-Windows-x64-Setup.exe), run it, then open **Ariadne** from the Start menu. Python and the required libraries are included. Requires 64-bit Windows 10 or newer; this installer is unsigned.
+
+Start with the [small-business guide](docs/SMALL_BUSINESS_START.md). Version 0.1.0 is early access; every design needs review and test sewing.
+
+### Install from source (developers, macOS and Linux)
 
 Requires Python 3.11 or newer. Windows Python normally includes Tk; Linux distributions may require their `python3-tk` package. Installation downloads open-source dependencies once; conversion then works offline.
 
@@ -30,7 +34,7 @@ macOS / Linux:
 .venv/bin/ariadne-studio
 ```
 
-Or install the supplied wheel with `python -m pip install path/to/ariadne_embroidery-0.1.0-py3-none-any.whl`, then run `ariadne gui`. This is a source/Python release; a signed standalone executable is not included.
+Or install the supplied wheel with `python -m pip install path/to/ariadne_embroidery-0.1.0-py3-none-any.whl`, then run `ariadne gui`. The source archives and wheel are separate from the Windows installer.
 
 ## Make a design
 
