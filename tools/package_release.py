@@ -17,7 +17,7 @@ def package(output):
     version = tomllib.loads((root/"pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
     root_files = {"pyproject.toml", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "CHANGELOG.md", "CONTRIBUTING.md", "MANIFEST.in", ".gitignore"}
     directories = {"src", "docs", "examples", "tests", "tools", ".github"}
-    extensions = {".py", ".md", ".json", ".png", ".txt", ".pes", ".dst", ".yml"}
+    extensions = {".py", ".md", ".json", ".png", ".txt", ".pes", ".dst", ".yml", ".nsi"}
     files = []
     for path in sorted(root.rglob("*")):
         if not path.is_file():
