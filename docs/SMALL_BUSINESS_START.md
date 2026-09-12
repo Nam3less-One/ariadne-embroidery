@@ -4,7 +4,7 @@ Ariadne creates editable embroidery drafts from simple artwork and exports PES a
 
 ## Is this release right for you?
 
-Version 0.1.0 is an early-access **Python/source release**. It includes a desktop app, but you must install Python and the package first. A standalone Windows installer is not included. For advanced lettering and visual editing, [Ink/Stitch](https://inkstitch.org/) is another free open-source option to investigate.
+Version 0.1.0 is early access. On 64-bit Windows 10 or newer, use the **Windows installer**; it includes Python and the required libraries. Source packages remain available for developers and other operating systems. For advanced lettering and visual editing, [Ink/Stitch](https://inkstitch.org/) is another free open-source option to investigate.
 
 Start with a few solid colors, large clear shapes and a transparent background. Photographs, gradients and tiny text require significant editing and experienced digitizing.
 
@@ -12,7 +12,8 @@ Start with a few solid colors, large clear shapes and a transparent background. 
 
 | Download | Purpose |
 | --- | --- |
-| `ariadne-embroidery-0.1.0-source.zip` | First-time installation with examples and instructions |
+| `Ariadne-0.1.0-Windows-x64-Setup.exe` | Recommended for Windows: setup wizard, Start menu shortcut, bundled Python |
+| `ariadne-embroidery-0.1.0-source.zip` | Source installation with examples and instructions |
 | `ariadne_embroidery-0.1.0-py3-none-any.whl` | Installation by someone familiar with Python packages |
 | `ariadne_embroidery-0.1.0.tar.gz` | Source packaging and developer workflows |
 | `SHA256SUMS.txt` | Verify release file checksums |
@@ -20,6 +21,14 @@ Start with a few solid colors, large clear shapes and a transparent background. 
 If you downloaded the combined release ZIP, extract it, then extract the source ZIP inside. The folder containing `README.md` and `pyproject.toml` is the source folder. Do not send the program ZIP to an embroidery machine: only the exported machine file belongs there.
 
 ## Install once on Windows
+
+1. [Download the setup program](https://github.com/Nam3less-One/ariadne-embroidery/releases/download/v0.1.0/Ariadne-0.1.0-Windows-x64-Setup.exe).
+2. Run it and follow the setup wizard. The installer is unsigned.
+3. Open **Ariadne** from the Windows Start menu. No Python setup or commands are required.
+
+It installs for your Windows account. Use Windows Settings > Apps to uninstall. Save your designs in Documents or another working folder. The example artwork is in the installed application's `examples` folder.
+
+### Optional source installation
 
 Install Python 3.11 or newer from [python.org](https://www.python.org/downloads/), including Tk support. Open a terminal in the extracted source folder:
 
